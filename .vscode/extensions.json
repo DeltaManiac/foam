@@ -22,5 +22,8 @@
 
     // Understated grayscale theme (light and dark variants)
     "philipbe.theme-gray-matter"
+
+    // Easier to paste image
+    "mushan.vscode-paste-image"
   ]
 }
