@@ -1,8 +1,8 @@
 # Apache Kafka
 
 - pub-sub messaging system
-- basic unit --> message => { Body :[u8], Key:[u8]}
-- writes are mainly batch operations => Vec<Messages>
+- basic unit --> message =>`{ Body :[u8], Key:[u8]}`
+- writes are mainly batch operations => `Vec<Messages>`
 - Schema --> governs structure of message
   - eg JSON/XML/[Apache Avro](https://avro.apache.org/docs/current/)
 - Topics --> collection of messages "about something same"
