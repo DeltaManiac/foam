@@ -3,10 +3,24 @@
   "editor.wrappingIndent": "indent",
   "editor.overviewRulerBorder": false,
   "editor.lineHeight": 24,
-  "workbench.colorTheme": "Gray Matter Dark",
+  "workbench.colorTheme": "Kimbie Dark",
   "[markdown]": {
     "editor.quickSuggestions": true
   },
   "git.enableSmartCommit": true,
-  "git.postCommitCommand": "sync"
+  "git.postCommitCommand": "sync",
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#ea4334",
+    "activityBar.activeBorder": "#09570f",
+    "activityBar.background": "#ea4334",
+    "activityBar.foreground": "#e7e7e7",
+    "activityBar.inactiveForeground": "#e7e7e799",
+    "activityBarBadge.background": "#09570f",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "statusBar.background": "#d52616",
+    "statusBar.border": "#d52616",
+    "statusBar.foreground": "#e7e7e7",
+    "statusBarItem.hoverBackground": "#ea4334"
+  },
+  "peacock.color": "#d52616"
 }
