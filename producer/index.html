@@ -62,8 +62,7 @@ buf.clear();
     }
 }
 
-</code></pre><p>Schema Registry for confluent : <a href="https://github.com/gklijs/schema_registry_converter">https://github.com/gklijs/schema_registry_converter</a>
-Confluent Write up : <a href="https://www.confluent.io/blog/getting-started-with-rust-and-kafka/">https://www.confluent.io/blog/getting-started-with-rust-and-kafka/</a></p><h2 id="in-golang" style="position:relative">In [<a title="Golang" href="/foam/golang">golang</a>]</h2><p>Package : <a href="https://github.com/confluentinc/confluent-kafka-go">Confluent Inc</a></p><pre><code class="language-golang">func main() {
+</code></pre><p>Schema Registry for confluent : <a href="https://github.com/gklijs/schema_registry_converter">https://github.com/gklijs/schema_registry_converter</a></p><p>Confluent Write up : <a href="https://www.confluent.io/blog/getting-started-with-rust-and-kafka/">https://www.confluent.io/blog/getting-started-with-rust-and-kafka/</a></p><hr/><h2 id="in-golang" style="position:relative">In [<a title="Golang" href="/foam/golang">golang</a>]</h2><p>Package : <a href="https://github.com/confluentinc/confluent-kafka-go">Confluent Inc</a></p><pre><code class="language-golang">func main() {
 
     p, err := kafka.NewProducer(&amp;kafka.ConfigMap{&quot;bootstrap.servers&quot;: &quot;localhost&quot;})
     if err != nil {
@@ -114,8 +113,7 @@ Confluent Write up : <a href="https://www.confluent.io/blog/getting-started-with
 
     conn.Close()
 }
-</code></pre><p>Package : <a href="https://github.com/Shopify/sarama">Sarama</a></p><pre><code class="language-golang">
-//Sync Producer
+</code></pre><p>Package : <a href="https://github.com/Shopify/sarama">Sarama</a></p><pre><code class="language-golang">//Sync Producer
 func newDataCollector(brokerList []string) sarama.SyncProducer {
 
     // For the data collector, we are looking for strong consistency semantics.
