@@ -25,5 +25,9 @@
 
     // Easier to paste image
     "mushan.vscode-paste-image",
+
+    // Adds sidebar coloring
+    "johnpapa.vscode-peacock",
+
   ]
 }
