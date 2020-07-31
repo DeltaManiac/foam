@@ -1,6 +1,6 @@
 # Rust
 
-# KAFKA
+## Kafka
 
 Kafka [[Producer]]
 
