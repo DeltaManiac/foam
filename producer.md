@@ -18,7 +18,7 @@ Store schema identifier in produced message
 
 # Creating a Producer
 
-## In [[Rust]]
+## In [[rust]]
 
 Crate : [kafka](https://crates.io/crates/kafka)
 
