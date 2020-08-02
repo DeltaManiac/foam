@@ -21,7 +21,7 @@ Spring boot like framework for [[golang]]. It has 3 major Components
   - grpc
   - http
 
-## Building a `pastebin` clone
+# Building a `pastebin` clone
 
 ## Define a service blueprint interface
 
