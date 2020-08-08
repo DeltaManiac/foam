@@ -1,5 +1,6 @@
 # Rust
-
+## Reddit Bot
+VyomBot [[vyom]]
 ## Kafka
 
 Kafka [[Producer]]
