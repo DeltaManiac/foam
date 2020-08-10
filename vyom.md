@@ -317,8 +317,192 @@ Damn! IT REPLIED AGAIN!!! And this is what the subbreddit looks like.
 
 ![replies,Replies,REPLIES](https://dev-to-uploads.s3.amazonaws.com/i/fdjrhs96s7yujerdqbu8.png)
 
-I guess this a good place to stop. 
-In the next part we will find the reason for this pesky little bug and squash it.
+Well, its just as we suspected, when we reply to a mention with the comment function it does not change the status of the message. Sifting through the documentation of roux we can find a method that marks a message as read.
+
+The place we are at right now reminds of a the poem The Road Not Taken by Robert Frost. It talks about how the author finds two roads diverging in the wood and he ponders which one to travel upon. I ask you to take a few minutes and read the poem, its beautiful.
+
+I'll be waiting!
+
+Oh BTW the code can be found on Github
+
+<---- PART II --->
+If you had read the poem mentioned in the previous part, you can be pretty sure what we are going to do right now. You Betcha! We are going to go down the Rabbit Hole. 
+
+Just as in the poem it would have been easy for us to change the library to something that already has a `mark as read` method like many do and continue on, but like Frost we will take the road not taken and that might make all the difference. 😉
+
+## Down the Rabbit Hole
+
+We actually got stumped on the last part because there was no method to mark a message as read in `roux`. This makes one wonder if there isn't such an api for reddit or that `roux` just didn't implement it.
+
+Lets head to [reddit api docs](https://www.reddit.com/dev/api) and try our luck.
+
+Yep, reddit does have a [`read_message`](https://www.reddit.com/dev/api#POST_api_read_message) api for us to use exactly for this purpose. The api accepts a list of [fullnames](https://www.reddit.com/dev/api#fullnames) with an HTTP POST method.
+
+What is the `fullname` for our message ? Its nothing but the `name` parameter of the struct.
+
+Now to fix `roux`, so that we can mark the message as read.
+
+Lets clone the [roux source code](https://github.com/halcyonnouveau/roux.rs) into another directory.
+
+Since the `comment` method we used is an api which POSTS the comment data to reddit. Perhaps we can ~~reuse~~, who are we kidding ? We can definitely *copy-paste* and modify the code to send some data to the `read_message` api.
+
+> While searching for a way to mark a message as read, we came up across another api [`message/unread`](https://www.reddit.com/dev/api#GET_message_unread) which returns only the unread messages from our inbox, so we don't have to filter out on the `new` flag of the response anymore. Yay!
+```rust
+# src/me/mod.rs
+...
+/// Get user's submitted posts.
+    pub async fn inbox(&self) -> Result<BasicListing<InboxItem>, RouxError> {
+        Ok(self
+            .get("message/inbox")
+            .await?
+            .json::<BasicListing<InboxItem>>()
+            .await?)
+    }
+
+/** This is our addition **/
+///  Get users unread messages
+    pub async fn unread(&self) -> Result<BasicListing<InboxItem>, RouxError> {
+        Ok(self
+            .get("message/unread")
+            .await?
+            .json::<BasicListing<InboxItem>>()
+            .await?)
+    }
+
+/** This is our addition **/
+/// Mark message as read
+    pub async fn mark_read(&self, ids: &str) -> Result<Response, RouxError> {
+        let form = [("id", ids)];
+        self.post("api/read_message", &form).await
+    }
+
+/** This is our addition **/
+/// Mark messages as unread
+    pub async fn mark_read(&self, ids: &str) -> Result<Response, RouxError> {
+        let form = [("id", ids)];
+        self.post("api/unread_message", &form).await
+    }
+
+    pub async fn comment(&self, text: &str, parent: &str) -> Result<Response, RouxError> {
+        let form = [("text", text), ("parent", parent)];
+        self.post("api/comment", &form).await
+    }
+...
+```
+> I've submitted a [PR](https://github.com/halcyonnouveau/roux.rs/pull/13) to roux with these changes.
+{% github https://github.com/halcyonnouveau/roux.rs/pull/13 %}
+
+So all is good and well with the change, but how do we use this changed version with our code ?
+
+`Cargo.toml` is the answer. We can tell `Cargo.toml` to use the code from a directory or from a url for a specified crate. Since we have a the modified source code in our system, we can point to that to get it working.
+```toml
+# Cargo.toml
+
+[package]
+name = "vyom"
+version = "0.1.0"
+authors = ["Harikrishnan Menon <harikrishnan.menon@sap.com>"]
+edition = "2018"
+
+[dependencies]
+roux={path="../roux.rs"} #This points to our local modified copy
+# roux={git = "https://github.com/DeltaManiac/roux.rs"} #This points to the modified version on github
+dotenv_codegen="0.15.0"
+tokio = {version="0.2.22", features=["macros"]}
+env_logger ="0.7.1"
+log = "0.4.11"
+```
+When we build our project now, we can see that it picks up the roux source code from the new path specified by us.
+```shell
+(base) DeltaManiac @ ~/git/rust/vyom
+└─ $ cargo build
+   Compiling roux v1.0.1-alpha.0 (/Users/DeltaManiac/git/rust/roux.rs)
+   Compiling vyom v0.1.0 (/Users/DeltaManiac/git/rust/vyom)
+   Finished dev [unoptimized + debuginfo] target(s) in 6.70s
+```
+> If we don't want go through the hassle of doing this, we can point cargo to my fork which has the necessary changes. This is how the code would be in the repository.
+
+## Actually Squashing the Bug
+
+Now that we are back from our exceedingly educating trip down the rabbit hole, lets see how we can finally mark a message as read after we reply to it.
+
+```rust
+# main.rs
+...
+...
+// Fetch only the unread messages form the inbox of the logged in user
+Ok(client) => match client.unread().await {
+    Ok(listing) => {
+        for message in listing.data.children.iter() {
+            // We have removed the `new` check
+            if message.data.r#type == "username_mention" {
+                match client
+                    .comment(
+                        "Thank you for standing by while we squished a bug. You shouldn't be seeing this message again!",
+                        &message.data.name.as_str(),
+                    )
+                    .await
+                {
+                    Ok(_) => {
+                        info!("Replied to {}", message.data.name);
+                        match client.mark_read(message.data.name.as_str()).await {
+                            Ok(_) => info!("Marked {} as read", message.data.name),
+                            Err(_) => {
+                                error!("Failed to mark {} as read", message.data.name)
+                            }
+                        }
+                    }
+                    Err(_) => error!("Failed to reply to mention {}", message.data.name),
+                };
+            }
+        }
+    }
+...
+...
+```
+We have changed the reply text so that we can identify from reddit that it is actually the new reply that is being sent, and we call the `mark_read` method form the modified crate to mark the message as read.
+
+Lets run the code and see if it works. Fingers Crossed.
+```shell
+(base) DeltaManiac @ ~/git/rust/vyom
+└─ $ cargo run   
+   Compiling vyom v0.1.0
+    Finished dev [unoptimized + debuginfo] target(s) in 4.41s
+     Running `target/debug/vyom`
+[2020-08-09T16:38:11Z INFO  vyom] Replied to t1_g0vfbra
+[2020-08-09T16:38:11Z INFO  vyom] Marked t1_g0vfbra as read
+```
+Cool, but does it actually mark the message as read? Lets run the program again a couple more times and figure it out.
+```shell
+(base) DeltaManiac @ ~/git/rust/vyom
+└─ $ cargo run
+    Finished dev [unoptimized + debuginfo] target(s) in 0.10s
+     Running `target/debug/vyom`
+(base) DeltaManiac @ ~/git/rust/vyom
+└─ $ cargo run
+    Finished dev [unoptimized + debuginfo] target(s) in 0.10s
+     Running `target/debug/vyom`
+(base) DeltaManiac @ ~/git/rust/vyom
+└─ $
+```
+
+Since there doesn't seem to to be any logs being printed we can confirm that we are not replying again to the message. But it programming and you never know if you're right until you completely verify from reddit side too. Let go take a look at the subreddit.
+
+![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/0zxm1grbg2p41xjmmmjh.png)
+
+Yep, it has only one comment.
+
+## Extracting the Intel
+
+Now that we have figured out how to respond to comments, lets get to the actual crux of the problem. 
+
+When a VyomBot gets mentioned where should he look for the Youtube link? There can be many answers to this question like
+1. The immediate parent comment of the mention
+2. The title of the post
+3. It could be part of the message passed along with the username mention.
+
+These all seem relevant, but to keep it simple lets start with 1, i.e if the parent is a YouTube playlist link then we fetch the information and post it as a comment
+
 
 [//begin]: # "Autogenerated link references for markdown compatibility"
 [rust]: rust "Rust"
