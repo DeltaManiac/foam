@@ -49,7 +49,7 @@ fn main(){
 ```
 ```shell
 DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.08s
      Running `target/debug/vyom`
 Client ID: SmQ7CzGkKA62yA
@@ -82,7 +82,7 @@ Since our bot wont work without a `client_id` and a `client_secret` we call [pan
 
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.41s
      Running `target/debug/vyom`
 thread 'main' panicked at \'Couldn\'t read CLIENT_ID (environment variable not found), 
@@ -91,12 +91,12 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 
 # Set the environment variables
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ export CLIENT_SECRET=UItY35BYBEN_rFVnGVzud9Pig6g
+└─ > export CLIENT_SECRET=UItY35BYBEN_rFVnGVzud9Pig6g
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ export CLIENT_ID=SmQ7CzGkKA62yA
+└─ > export CLIENT_ID=SmQ7CzGkKA62yA
 
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.47s
      Running `target/debug/vyom`
 Client ID: SmQ7CzGkKA62yA
@@ -141,7 +141,7 @@ fn main(){
 ```
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.08s
      Running `target/debug/vyom`
 Env Not on Sys: ss #Value from the .env file
@@ -235,7 +235,7 @@ When we run the program we get the number of messages we have and the `dbg!` mac
 
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 3.71s
      Running `target/debug/vyom`
 Message Count 5
@@ -302,7 +302,7 @@ Now that we have written the code lets run it and see what happens..
 
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 4.45s
      Running `target/debug/vyom`
 ```
@@ -310,12 +310,12 @@ Nice! It logged that we replied to the mention. Lets run it again, this time it 
 ```shell
 [2020-08-09T12:59:25Z INFO  vyom] Replied to t1_g0vfbra
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.10s
      Running `target/debug/vyom`
 [2020-08-09T12:59:29Z INFO  vyom] Replied to t1_g0vfbra
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.09s
      Running `target/debug/vyom`
 [2020-08-09T12:59:32Z INFO  vyom] Replied to t1_g0vfbra
@@ -430,7 +430,7 @@ log = "0.4.11"
 When we build our project now, we can see that it picks up the roux source code from the new path specified by us.
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo build
+└─ > cargo build
    Compiling roux v1.0.1-alpha.0 (/Users/DeltaManiac/git/rust/roux.rs)
    Compiling vyom v0.1.0 (/Users/DeltaManiac/git/rust/vyom)
    Finished dev [unoptimized + debuginfo] target(s) in 6.70s
@@ -480,7 +480,7 @@ We have changed the reply text so that we can identify from reddit that it is ac
 Lets run the code and see if it works. Fingers Crossed.
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run   
+└─ > cargo run   
    Compiling vyom v0.1.0
     Finished dev [unoptimized + debuginfo] target(s) in 4.41s
      Running `target/debug/vyom`
@@ -490,15 +490,15 @@ Lets run the code and see if it works. Fingers Crossed.
 Cool, but does it actually mark the message as read? Lets run the program again a couple more times and figure it out.
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.10s
      Running `target/debug/vyom`
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.10s
      Running `target/debug/vyom`
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $
+└─ >
 ```
 
 Since there doesn't seem to to be any logs being printed we can confirm that we are not replying again to the message. But it programming and you never know if you're right until you completely verify from reddit side too. Let go take a look at the subreddit.
@@ -663,7 +663,7 @@ dbg!(playlist_id);
 
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run   
+└─ > cargo run   
 Compiling vyom v0.1.0
 Finished dev [unoptimized + debuginfo] target(s) in 5.09s     Running `target/debug/vyom`
 [src/main.rs:200] "playlist_id" = "PLf3u8NhoEikhTC5radGrmmqdkOK-xMDoZ"
@@ -1017,7 +1017,7 @@ If we have a playlistID we then call YouTube API with the key we generated earli
 Lets try it out!
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ $ cargo run
+└─ > cargo run
    Compiling vyom v0.1.0
     Finished dev [unoptimized + debuginfo] target(s) in 5.79s
      Running `target/debug/vyom`
