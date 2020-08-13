@@ -430,7 +430,6 @@ Since the `comment` method we used is an api which POSTS the comment data to red
 ```
 
 > I've submitted a [PR](https://github.com/halcyonnouveau/roux.rs/pull/13) to roux with these changes.
-> {% github https://github.com/halcyonnouveau/roux.rs/pull/13 %}
 
 So all is good and well with the change, but how do we use this changed version with our code ?
 
