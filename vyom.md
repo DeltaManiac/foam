@@ -1,16 +1,18 @@
 # Vyom
 
-The surmised version of how to write a Reddit Bot in  [[rust]]
-# Part I 
+The surmised version of how to write a Reddit Bot in [[rust]]
+
+# Part I
 
 Recently while browsing [reddit](https://old.reddit.com) I came up on a [post](https://www.reddit.com/r/rust/comments/i1satq/webference_rusty_days_2020_all_recorded_talks/g01rwq8/?context=3) in the [/r/rust](https://old.reddit.com) subreddit which was a link to a YouTube playlist for the Rusty-Days conference, however there was no way I could find the contents of the playlist without going to YouTube on my phone. This was a nuance so I went to YouTube and curated the list.
 
 ![Manually listing the entries](https://dev-to-uploads.s3.amazonaws.com/i/fxof8cdxfizue63qkz7d.png)
 
-This was going to be tiresome if I'd have to do it every time I see a post that links to a YouTube playlist. 
+This was going to be tiresome if I'd have to do it every time I see a post that links to a YouTube playlist.
 So here we are writing a bot do this task for everyone. This bot will run on a server somewhere (hopefully forever) and curate playlist info for all the people who avail its service.
 
 # Creating Credentials For Our Bot
+
 In order to write our bot we first need to get some credentials from reddit so that we can access [reddit apis](https://old.reddit.com/dev/api) programmatically.
 
 First we need an application id and secret so that reddit can know our application. We can get this information by going to [preferences/app](https://www.reddit.com/prefs/apps) and clicking `are you a developer? create an app...` button cause **we definitely are.**
@@ -25,7 +27,7 @@ Reddit lets us choose the type of the app we want to build. The three types of a
 
 More info about about the apps can be found [here](https://github.com/reddit-archive/reddit/wiki/oauth2-app-types).
 
-We choose the `script` type, enter a name and description for our bot, and use  the dummy url `http://www.example.com/unused/redirect/uri` for the redirect url.
+We choose the `script` type, enter a name and description for our bot, and use the dummy url `http://www.example.com/unused/redirect/uri` for the redirect url.
 
 ![Create App](https://dev-to-uploads.s3.amazonaws.com/i/weyxca7xkhcnfrwo36kj.png)
 
@@ -34,6 +36,7 @@ We have now created the credentials with Client Id : `TjC0s2uTaTHYCg` and Client
 ![Credentials](https://dev-to-uploads.s3.amazonaws.com/i/xj0q1m7li5abg060ari6.png)
 
 # Using and Storing the credentials
+
 We can now hard code the credentials in our source code and use like this.
 
 ```rust
@@ -47,9 +50,10 @@ fn main(){
     println!("Client Secret: {}",CLIENT_SECRET);
 }
 ```
+
 ```shell
 DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.08s
      Running `target/debug/vyom`
 Client ID: SmQ7CzGkKA62yA
@@ -78,25 +82,26 @@ fn main(){
     };
 }
 ```
+
 Since our bot wont work without a `client_id` and a `client_secret` we call [panic!](https://doc.rust-lang.org/stable/std/macro.panic.html) so that the application exits with an error.
 
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.41s
      Running `target/debug/vyom`
-thread 'main' panicked at \'Couldn\'t read CLIENT_ID (environment variable not found), 
+thread 'main' panicked at \'Couldn\'t read CLIENT_ID (environment variable not found),
 src/main.rs:9:19
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 
 # Set the environment variables
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > export CLIENT_SECRET=UItY35BYBEN_rFVnGVzud9Pig6g
+└─ $ export CLIENT_SECRET=UItY35BYBEN_rFVnGVzud9Pig6g
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > export CLIENT_ID=SmQ7CzGkKA62yA
+└─ $ export CLIENT_ID=SmQ7CzGkKA62yA
 
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.47s
      Running `target/debug/vyom`
 Client ID: SmQ7CzGkKA62yA
@@ -106,6 +111,7 @@ Client Secret: UItY35BYBEN_rFVnGVzud9Pig6g
 Most of the time we don't really want to export a lot of environment variables manually. It is exhausting. We could fix this problem by writing a shell script that has all our `export` statements... or we can use [dotenv](https://crates.io/crates/dotenv). Dotenv is a crate that provides us a way to put environment variables in a `.env` file and read them. Dotenv is smart to enough to only read from the file if the Environment Variable is **not set** on the system.
 
 We first add the `dotenv` dependency to our `Cargo.toml` file.
+
 ```toml
 # Cargo.toml
 [package]
@@ -119,6 +125,7 @@ dotenv_codegen="0.15.0" # dotenv dependency
 ```
 
 We then setup the environment variables in the `.env` file.
+
 ```shell
 # .env
 CLIENT_ID=test_123
@@ -126,7 +133,8 @@ CLIENT_SECRET=test_321
 Test=DeezTests
 ```
 
-We finally modify our code to use the `dotenv` crate. 
+We finally modify our code to use the `dotenv` crate.
+
 ```rust
 # main.rs
 
@@ -139,19 +147,23 @@ fn main(){
     println!("Client Secret: {}",dotenv!("CLIENT_SECRET"));
 }
 ```
+
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.08s
      Running `target/debug/vyom`
 Env Not on Sys: ss #Value from the .env file
 Client ID: SmQ7CzGkKA62yA #Value from the system
 Client Secret: UItY35BYBEN_rFVnGVzud9Pig6g #Value from the system
 ```
-# How will the bot work ? 
-The bot will listen to a mention like `/u/VyomBot` and would check if the post is a link to a YouTube playlist or  at a later stage if the parent comment of the mention is a YouTube playlist.
+
+# How will the bot work ?
+
+The bot will listen to a mention like `/u/VyomBot` and would check if the post is a link to a YouTube playlist or at a later stage if the parent comment of the mention is a YouTube playlist.
 
 # Setting up Reddit
+
 We can follow these steps to setup reddit for testing/developing this bot
 
 1. Created a new user called [VyomBot](https://old.reddit.com/user/VyomBot) so that the bot can be mentioned via `/u/VyomBot`
@@ -165,21 +177,22 @@ We can follow these steps to setup reddit for testing/developing this bot
 4. Create a new [post](https://www.reddit.com/r/VyomBot/comments/i6fk15/test_playlist/?) with the link to the playlist.
 
 5. Mention `/u/VyomBot` in the comments.
-![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/vriyg18m5dgc5k8rklc4.png)
+   ![Alt Text](https://dev-to-uploads.s3.amazonaws.com/i/vriyg18m5dgc5k8rklc4.png)
 
 # Talking to Reddit
 
 ## Getting Messages from Inbox
 
-Lets start off by querying reddit to see if we have a new mention and printing the message. We will use the [roux](https://crates.io/crates/roux) crate for interacting with the reddit apis. 
+Lets start off by querying reddit to see if we have a new mention and printing the message. We will use the [roux](https://crates.io/crates/roux) crate for interacting with the reddit apis.
 Direct quote from the description of the crate
 
 > A simple, asynchronous Reddit API wrapper implemented in Rust.
 
-This means that we have to use a framework like [tokio](https://crates.io/crates/tokio) to provide the async runtime for our bot. 
+This means that we have to use a framework like [tokio](https://crates.io/crates/tokio) to provide the async runtime for our bot.
 Lets go about doing that.
 
 Add the dependencies to our Cargo.toml file.
+
 ```toml
 # Cargo.toml
 [package]
@@ -193,7 +206,9 @@ dotenv_codegen="0.15.0" # dotenv dependency
 roux="1.0.0" # roux dependency
 tokio = {version="0.2.22",features=["macros"]} # tokio dependency and only enable the macro feature
 ```
+
 Update our code to use the library and call the reddit apis.
+
 ```rust
 # main.rs
 
@@ -231,11 +246,11 @@ async fn main() {
 
 ```
 
-When we run the program we get the number of messages we have and the `dbg!` macro shows what the passed in variable which in this case is a `InboxItem` struct, looks like. 
+When we run the program we get the number of messages we have and the `dbg!` macro shows what the passed in variable which in this case is a `InboxItem` struct, looks like.
 
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 3.71s
      Running `target/debug/vyom`
 Message Count 5
@@ -252,7 +267,7 @@ Message Count 5
     subreddit_name_prefixed: Some(
         "r/VyomBot",
     ),
-    new: true, 
+    new: true,
     type: "username_mention",
     body: "/u/VyomBot",
     dest: "VyomBot",
@@ -263,12 +278,15 @@ Message Count 5
     context: "/r/VyomBot/comments/i6fk15/test_playlist/g0vfbra/?context=3",
 }
 ```
+
 We can use the `new` property to identify if this is a message that we had previously read.
 The type property can be used to determine if the item is a comment or a username mention.
-We can use this to iterate over the messages retrieved and  and determine the messages that we have to reply to. 
+We can use this to iterate over the messages retrieved and and determine the messages that we have to reply to.
 
 # Replying to the message
+
 Roux provides us a convenient method aptly name `comment` to reply to the message. Let's go ahead and use this to reply to the message.
+
 ```rust
 # main.rs
 
@@ -296,52 +314,57 @@ async fn main() {
 ...
 ...
 ```
-> Psst.., I'll let you in on something cool. In rust `type` is a reserved keyword. In most programming languages you can use a keyword only as keyword, e.g. you *cannot* have a variable called `for`. In rust we can use `type` as an attribute of a struct and access it by specifying it as a raw string using the `r#` like `message.data.r#type`
+
+> Psst.., I'll let you in on something cool. In rust `type` is a reserved keyword. In most programming languages you can use a keyword only as keyword, e.g. you _cannot_ have a variable called `for`. In rust we can use `type` as an attribute of a struct and access it by specifying it as a raw string using the `r#` like `message.data.r#type`
 
 Now that we have written the code lets run it and see what happens..
 
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 4.45s
      Running `target/debug/vyom`
 ```
+
 Nice! It logged that we replied to the mention. Lets run it again, this time it should not reply to an already replied message as we have read it.
+
 ```shell
 [2020-08-09T12:59:25Z INFO  vyom] Replied to t1_g0vfbra
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.10s
      Running `target/debug/vyom`
 [2020-08-09T12:59:29Z INFO  vyom] Replied to t1_g0vfbra
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.09s
      Running `target/debug/vyom`
 [2020-08-09T12:59:32Z INFO  vyom] Replied to t1_g0vfbra
 ```
-Damn! 
+
+Damn!
 IT REPLIED AGAIN!!!😞
 And this is what the subreddit looks like now.
 
 ![replies,Replies,REPLIES](https://dev-to-uploads.s3.amazonaws.com/i/fdjrhs96s7yujerdqbu8.png)
 
-Time to find that pesky bug and get rid of it for good. 
+Time to find that pesky bug and get rid of it for good.
 
 Lets go to reddit and see what the inbox looks like.
 
 ![Unread Message](https://dev-to-uploads.s3.amazonaws.com/i/hjb7uxcod9jfirud71qy.png)
 
-Well, its just as we suspected, when we reply to a mention with the `comment` function it does not change the status of the message. Sifting through the [documentation](https://docs.rs/roux/1.0.0/roux/?search=read) of `roux` we can find a method that marks a message as `read`. 
+Well, its just as we suspected, when we reply to a mention with the `comment` function it does not change the status of the message. Sifting through the [documentation](https://docs.rs/roux/1.0.0/roux/?search=read) of `roux` we can find a method that marks a message as `read`.
 
 The place we are at right now reminds of a the poem [The Road Not Taken](https://www.poetryfoundation.org/poems/44272/the-road-not-taken) by Robert Frost. It talks about how the author finds two roads diverging in the wood and he ponders which one to travel upon. I ask you to take a few minutes and read the poem, its beautiful.
 
 I'll be waiting!
 
 Oh BTW the code can be found on the `part-I` branch [here](https://github.com/DeltaManiac/VyomBot)
- 
+
 # Part II
-If you had read the poem mentioned in the previous part, you can be pretty sure what we are going to do right now. You Betcha! We are going to go down the Rabbit Hole. 
+
+If you had read the poem mentioned in the previous part, you can be pretty sure what we are going to do right now. You Betcha! We are going to go down the Rabbit Hole.
 
 Just as in the poem it would have been easy for us to change the library to something that already has a `mark as read` method like many do and continue on, but like Frost we will take the road not taken and that might make all the difference. 😉
 
@@ -359,9 +382,10 @@ Now to fix `roux`, so that we can mark the message as read.
 
 Lets clone the [roux source code](https://github.com/halcyonnouveau/roux.rs) into another directory.
 
-Since the `comment` method we used is an api which POSTS the comment data to reddit. Perhaps we can ~~reuse~~, who are we kidding ? We can definitely *copy-paste* and modify the code to send some data to the `read_message` api.
+Since the `comment` method we used is an api which POSTS the comment data to reddit. Perhaps we can ~~reuse~~, who are we kidding ? We can definitely _copy-paste_ and modify the code to send some data to the `read_message` api.
 
 > While searching for a way to mark a message as read, we came up across another api [`message/unread`](https://www.reddit.com/dev/api#GET_message_unread) which returns only the unread messages from our inbox, so we don't have to filter out on the `new` flag of the response anymore. Yay!
+
 ```rust
 # src/me/mod.rs
 ...
@@ -404,12 +428,14 @@ Since the `comment` method we used is an api which POSTS the comment data to red
     }
 ...
 ```
+
 > I've submitted a [PR](https://github.com/halcyonnouveau/roux.rs/pull/13) to roux with these changes.
-{% github https://github.com/halcyonnouveau/roux.rs/pull/13 %}
+> {% github https://github.com/halcyonnouveau/roux.rs/pull/13 %}
 
 So all is good and well with the change, but how do we use this changed version with our code ?
 
 `Cargo.toml` is the answer. We can tell `Cargo.toml` to use the code from a directory or from a url for a specified crate. Since we have a the modified source code in our system, we can point to that to get it working.
+
 ```toml
 # Cargo.toml
 
@@ -427,14 +453,17 @@ tokio = {version="0.2.22", features=["macros"]}
 env_logger ="0.7.1"
 log = "0.4.11"
 ```
+
 When we build our project now, we can see that it picks up the roux source code from the new path specified by us.
+
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo build
+└─ $ cargo build
    Compiling roux v1.0.1-alpha.0 (/Users/DeltaManiac/git/rust/roux.rs)
    Compiling vyom v0.1.0 (/Users/DeltaManiac/git/rust/vyom)
    Finished dev [unoptimized + debuginfo] target(s) in 6.70s
 ```
+
 > If we don't want go through the hassle of doing this, we can point cargo to my fork which has the necessary changes. This is how the code would be in the repository.
 
 ## Actually Squashing the Bug
@@ -475,30 +504,34 @@ Ok(client) => match client.unread().await {
 ...
 ...
 ```
+
 We have changed the reply text so that we can identify from reddit that it is actually the new reply that is being sent, and we call the `mark_read` method form the modified crate to mark the message as read.
 
 Lets run the code and see if it works. Fingers Crossed.
+
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run   
+└─ $ cargo run
    Compiling vyom v0.1.0
     Finished dev [unoptimized + debuginfo] target(s) in 4.41s
      Running `target/debug/vyom`
 [2020-08-09T16:38:11Z INFO  vyom] Replied to t1_g0vfbra
 [2020-08-09T16:38:11Z INFO  vyom] Marked t1_g0vfbra as read
 ```
+
 Cool, but does it actually mark the message as read? Lets run the program again a couple more times and figure it out.
+
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.10s
      Running `target/debug/vyom`
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
     Finished dev [unoptimized + debuginfo] target(s) in 0.10s
      Running `target/debug/vyom`
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ >
+└─ $
 ```
 
 Since there doesn't seem to to be any logs being printed we can confirm that we are not replying again to the message. But it programming and you never know if you're right until you completely verify from reddit side too. Let go take a look at the subreddit.
@@ -509,9 +542,10 @@ Yep, it has only one comment.
 
 ## Extracting the Intel
 
-Now that we have figured out how to respond to comments, lets get to the actual crux of the problem. 
+Now that we have figured out how to respond to comments, lets get to the actual crux of the problem.
 
 When a VyomBot gets mentioned where should he look for the Youtube link? There can be many answers to this question like
+
 1. The immediate parent comment of the mention
 2. The title of the post
 3. It could be part of the message sent to VyomBot
@@ -524,7 +558,8 @@ In order to get the link of the playlist we are not going to use the roux librar
 
 ### Constructing the Reddit Post link
 
-We can use the `context` field of the response which looks like 
+We can use the `context` field of the response which looks like
+
 ```json
 {
 ...
@@ -535,9 +570,10 @@ We can use the `context` field of the response which looks like
     context: "/r/VyomBot/comments/i6fk15/test_playlist/g0vfbra/?context=3",
 }
 ```
- to construct the url of the post.
 
-The first 5 parts `r`, `VyomBot`, `comments`, `i6fk15`, `test_playlist` can be used to for the url to the post. 
+to construct the url of the post.
+
+The first 5 parts `r`, `VyomBot`, `comments`, `i6fk15`, `test_playlist` can be used to for the url to the post.
 Let's do this right now.
 
 ```rust
@@ -558,7 +594,7 @@ let post_url = format!(
 ...
 ```
 
-We now have constructed the url `https://www.reddit.com/{}/r/VyomBot/comments/i6fk15/test_playlist/.json`. The `.json` at the end tells reddit to return the JSON formatted  and not the HTML page of the post id specified
+We now have constructed the url `https://www.reddit.com/{}/r/VyomBot/comments/i6fk15/test_playlist/.json`. The `.json` at the end tells reddit to return the JSON formatted and not the HTML page of the post id specified
 
 ### Extracting the Playlist ID
 
@@ -566,7 +602,7 @@ In order to query the url that we crafted above we would be using the [`reqwest`
 
 We then would convert the response body to a dynamic json using the [`serde_json`](https://crates.io/crates/serde_json) crate and then extract the link from the `url` property of the response.
 
-Then the [`url`](https://crates.io/crates/url) crate to parse and extract the playlist id from the YouTube link. For our link 
+Then the [`url`](https://crates.io/crates/url) crate to parse and extract the playlist id from the YouTube link. For our link
 `https://www.youtube.com/playlist?list=PLf3u8NhoEikhTC5radGrmmqdkOK-xMDoZ` the playlist id is `PLf3u8NhoEikhTC5radGrmmqdkOK-xMDoZ`.
 
 ```toml
@@ -615,7 +651,7 @@ let playlist_id = match reqwest::get(&post_url).await {
                 .unwrap()
                 .get("url")
             {
-                // Parse the youtube url from the string 
+                // Parse the youtube url from the string
                 // "https://www.youtube.com/playlist?list=PLf3u8NhoEikhTC5radGrmmqdkOK-xMDoZ"
                 // after trimming `"`
                 Some(url) => match url::Url::parse(
@@ -655,15 +691,13 @@ dbg!(playlist_id);
 ...
 ```
 
-> A better way to handle the response is to create a struct that mimics the reponsed and just let the `.json()` method of reqwest do the heavy lifting of converting it into rust types. This will help avoid all the calls to `unwrap`. 
-
-
+> A better way to handle the response is to create a struct that mimics the response and just let the `.json()` method of reqwest do the heavy lifting of converting it into rust types. This will help avoid all the calls to `unwrap`.
 
 > The nested matches statements should be replaced by `.and_then()` for a more cleaner and readable code.
 
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run   
+└─ $ cargo run
 Compiling vyom v0.1.0
 Finished dev [unoptimized + debuginfo] target(s) in 5.09s     Running `target/debug/vyom`
 [src/main.rs:200] "playlist_id" = "PLf3u8NhoEikhTC5radGrmmqdkOK-xMDoZ"
@@ -687,29 +721,31 @@ We need to generate a different set of credentials to talk with YouTube. Lets go
 1. Logon to [Google Developer Console](https://console.developer.google.com)
 
 2. Click `Enable Apis and Service`
-![Enable API](https://dev-to-uploads.s3.amazonaws.com/i/hdqpmrbd1hu5hsoulzdj.png)
+   ![Enable API](https://dev-to-uploads.s3.amazonaws.com/i/hdqpmrbd1hu5hsoulzdj.png)
 
 3. Search for `YouTube Data API v3`
-![YouTube Data API v3](https://dev-to-uploads.s3.amazonaws.com/i/wl3mybevggxlqbmgvesf.png)
+   ![YouTube Data API v3](https://dev-to-uploads.s3.amazonaws.com/i/wl3mybevggxlqbmgvesf.png)
 
 4. Click the `Enable` button to enable the API for our account
-![Enable YouTube API](https://dev-to-uploads.s3.amazonaws.com/i/69ipwnu5ntnmz4jctdc8.png)
+   ![Enable YouTube API](https://dev-to-uploads.s3.amazonaws.com/i/69ipwnu5ntnmz4jctdc8.png)
 
 5. Click the `Create Credentials` button to start creating credentials for us to use.
-![Create Credentials](https://dev-to-uploads.s3.amazonaws.com/i/iiu41fyb8h89h4xizu8j.png)
+   ![Create Credentials](https://dev-to-uploads.s3.amazonaws.com/i/iiu41fyb8h89h4xizu8j.png)
 
 6. We need to first describe what kind of credentials have to be generated. Don't worry, just follow the screenshot.
-![Generate Credentials](https://dev-to-uploads.s3.amazonaws.com/i/bgix1krigatizp0qbt6b.png)
+   ![Generate Credentials](https://dev-to-uploads.s3.amazonaws.com/i/bgix1krigatizp0qbt6b.png)
 
-7. We're Done! 
-![Done](https://dev-to-uploads.s3.amazonaws.com/i/kjb0e9q1e27mi3fbzqsl.png)
+7. We're Done!
+   ![Done](https://dev-to-uploads.s3.amazonaws.com/i/kjb0e9q1e27mi3fbzqsl.png)
 
 # Handling JSON better
 
 In the last part we used a dynamic JSON to to retrieve the playlist url from Reddit. This time to interact with the YouTube API we wont do that, instead we will one up ourselves and de-serialize the JSON into structs that we define in rust.
+
 > We use [`serde`](https://crates.io/crates/serde) to do handle the heavy lifting of JSON de-serialization
 
 The response of the YouTube API is a bit more well defined than the Reddit API.
+
 ```json
 {
   "kind": "youtube#playlistItemListResponse",
@@ -943,8 +979,10 @@ The response of the YouTube API is a bit more well defined than the Reddit API.
   }
 }
 ```
+
 This JSON response can be constructed from simple structs that we can define.
 The `#[derive(Deserialize)]` helps `serde` understand that it can use this struct to deserialize json into by matching the fields of the struct to those of that in the JSON body.
+
 > `serde` is an amazing library and a bit too vast to explain in this post.
 
 ```rust
@@ -967,6 +1005,7 @@ struct YoutubeResponse {
 ```
 
 Now that we have defined our struct lets go ahead and call the YouTube API.
+
 ```rust
 # main.rs
 
@@ -980,7 +1019,8 @@ if playlist_id.is_some() {
     let playlist_items = match reqwest::get(&url).await {
                         // Try to convert the response to our struct
         Ok(response) => match response.json::<YoutubeResponse>().await {
-                               // Return the array of Item            Ok(yt_response) => Some(yt_response.items),
+            // Return the array of Item
+            Ok(yt_response) => Some(yt_response.items),
             Err(e) => {
                 error!(
                     "Couldn't parse playlist response for comment {} reason : {}",
@@ -1015,21 +1055,24 @@ if playlist_id.is_some() {
 We first define `reply` with the string that we want to respond with if we fail to identify the playlist id.
 If we have a playlistID we then call YouTube API with the key we generated earlier. We then extract the items of the playlist generated our reply text. The code that we have written in the previous part already handles replying to the message.
 Lets try it out!
+
 ```shell
 (base) DeltaManiac @ ~/git/rust/vyom
-└─ > cargo run
+└─ $ cargo run
    Compiling vyom v0.1.0
     Finished dev [unoptimized + debuginfo] target(s) in 5.79s
      Running `target/debug/vyom`
 [2020-08-11T18:46:46Z INFO  vyom] Replied to t1_g14nya9
 [2020-08-11T18:46:46Z INFO  vyom] Marked t1_g14nya9 as read
 ```
+
 And on Reddit it looks just as beautiful!
 ![Final](https://dev-to-uploads.s3.amazonaws.com/i/poxb0f9lmqtufptsvo4j.png)
 
 ![](https://media.giphy.com/media/3oKIPf3C7HqqYBVcCk/giphy.gif)
 
 # Fin
+
 Thanks for joining along while we built our first bot :heart:.
 If this journey has taught you something, feel free to give a shout out!
 
