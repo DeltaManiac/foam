@@ -15,3 +15,5 @@
 - [x] Reddit Bot for Youtube PlayList
 - [ ] Cloud Events
 - [ ] k8s + Nats.io
+- [ ] Little Man Computer
+  - [ ] WASM Support
