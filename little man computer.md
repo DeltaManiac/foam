@@ -11,3 +11,8 @@ Inside the CPU there are:
 -  An Address Register to hold the bottom two digits of the instruction read from memory.
 -  An Input tray into which a number can be typed when needed.
 -  An Output area where any numbers output are printed.
+
+Instruction Cycle
+    - Instruction Fetch
+    - Increment Counter
+    - Instruction Execution
