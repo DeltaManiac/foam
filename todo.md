@@ -13,7 +13,7 @@
   https://azure.microsoft.com/mediahandler/files/resourcefiles/designing-distributed-systems/Designing_Distributed_Systems.pdf
 - [x] Migrate from old blog to new blog
 - [x] Reddit Bot for Youtube PlayList
-- [ ] Cloud Events
+- [x] Cloud Events
 - [ ] k8s + Nats.io
 - [ ] Little Man Computer
   - [ ] WASM Support
